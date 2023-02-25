@@ -1,3 +1,5 @@
+package services
+
 import (
 	"context"
 	"github.com/redis/go-redis/v9"
