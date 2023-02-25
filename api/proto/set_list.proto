@@ -1,0 +1,9 @@
+import "google/protobuf/wrappers.proto";
+
+message ListRequest {
+  string article = 1;
+}
+
+service ListRpc {
+  rpc SetList (stream ListRequest) returns (google.protobuf.Int32Value) {}
+}
