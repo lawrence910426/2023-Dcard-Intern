@@ -1,0 +1,1 @@
+protoc --go_out=dcard-intern --go_opt=paths=source_relative --go-grpc_out=dcard-intern --go-grpc_opt=paths=source_relative set_list.proto

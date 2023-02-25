@@ -7,6 +7,6 @@ message ListRequest {
   optional string article = 1;
 }
 
-service ListRpc {
+service List {
   rpc SetList (stream ListRequest) returns (google.protobuf.Int32Value) {}
 }
