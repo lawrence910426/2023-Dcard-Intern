@@ -16,15 +16,16 @@ func init() {
 }
 
 func Get(val) (key) {
+	fmt.Println("Get", key, val)
 	val, err := rdb.Get(ctx, key).Result()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(key, val)
 	return val
 }
 
 func Set() (key, val) {
+	fmt.Println("Set", key, val)
 	err := rdb.Set(ctx, key, val, 0).Err()
 	if err != nil {
 		panic(err)
