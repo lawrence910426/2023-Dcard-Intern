@@ -6,9 +6,9 @@ import (
 	"log"
 	"time"
 
+	pb "dcard-intern/proto/dcard-intern"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	pb "google.golang.org/grpc/examples/helloworld/helloworld"
 )
 
 const (
@@ -28,14 +28,26 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := pb.NewGreeterClient(conn)
+	client := pb.NewListClient(conn)
 
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: *name})
+	stream, err := client.SetList(ctx)
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("client.RecordRoute failed: %v", err)
 	}
-	log.Printf("Greeting: %s", r.GetMessage())
+	for i := 1; i < 5; i++ {
+		article_content := "qwer"
+		article := &pb.ListRequest{Article: &article_content}
+		if err := stream.Send(article); err != nil {
+			log.Fatalf("client.RecordRoute: stream.Send() failed: %v", err)
+		}
+	}
+
+	reply, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("client.RecordRoute failed: %v", err)
+	}
+	log.Printf("Route summary: %v", reply)
 }
