@@ -2,31 +2,31 @@ package services
 
 import (
 	"context"
-	"github.com/redis/go-redis/v9"
 	"fmt"
+	"github.com/redis/go-redis/v9"
 )
 
 var ctx = context.Background()
-var rdb
+var rdb *redis.Client
 
 func init() {
-	rdb := redis.NewClient(&redis.Options{
+	rdb = redis.NewClient(&redis.Options{
 		Addr:     "redis", // docker-compose had setup the hostname for redis
 		Password: "",      // No password. This is not recommended in production.
 		DB:       0,       // Use default database
 	})
 }
 
-func Get(val) (key) {
-	fmt.Println("Get", key, val)
+func Get(key string) string {
+	fmt.Println("Get", key)
 	val, err := rdb.Get(ctx, key).Result()
 	if err != nil {
-		panic(err)
+		return ""
 	}
 	return val
 }
 
-func Set() (key, val) {
+func Set(key string, val string) {
 	fmt.Println("Set", key, val)
 	err := rdb.Set(ctx, key, val, 0).Err()
 	if err != nil {

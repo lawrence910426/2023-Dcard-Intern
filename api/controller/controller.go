@@ -17,6 +17,10 @@ type Node struct {
 	NextPageKey string
 }
 
+type TailNode struct {
+	Article string
+}
+
 type ApiResponse struct {
 	ResultCode    string
 	ResultMessage interface{}
@@ -27,7 +31,7 @@ func GetHead(w http.ResponseWriter, r *http.Request) {
 	queryId := vars["id"]
 
 	var listHead HeadNode
-	listHead.NextPageKey = queryId
+	listHead.NextPageKey = services.Get(queryId + "_Key")
 
 	response := ApiResponse{"200", listHead}
 	services.ResponseWithJson(w, http.StatusOK, response)
@@ -37,9 +41,15 @@ func GetPage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	queryId := vars["id"]
 
-	var listNode Node
-	listNode.NextPageKey = queryId
+	nextPage := services.Get(queryId + "_Key")
+	article := services.Get(queryId + "_Article")
 
-	response := ApiResponse{"200", listNode}
+	var response ApiResponse
+	if nextPage == "" {
+		response = ApiResponse{"200", &TailNode{Article: article}}
+	} else {
+		response = ApiResponse{"200", &Node{NextPageKey: nextPage, Article: article}}
+	}
+
 	services.ResponseWithJson(w, http.StatusOK, response)
 }
