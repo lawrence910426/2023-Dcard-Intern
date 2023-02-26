@@ -12,4 +12,4 @@ services:
 
   redis:
     container_name: 'redis-db'
-    image: 'redis:9-bullseye'
+    image: 'redis:6-bullseye'

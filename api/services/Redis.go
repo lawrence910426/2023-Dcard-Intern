@@ -11,9 +11,9 @@ var rdb *redis.Client
 
 func init() {
 	rdb = redis.NewClient(&redis.Options{
-		Addr:     "redis", // docker-compose had setup the hostname for redis
-		Password: "",      // No password. This is not recommended in production.
-		DB:       0,       // Use default database
+		Addr:     "redis:6379", // docker-compose had setup the hostname for redis
+		Password: "",           // No password. This is not recommended in production.
+		DB:       0,            // Use default database
 	})
 }
 
