@@ -32,4 +32,7 @@ func Set(key string, val string) {
 	if err != nil {
 		panic(err)
 	}
+
+	// Expire the key after 1 day.
+	rdb.Expire(ctx, key, 86400)
 }

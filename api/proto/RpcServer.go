@@ -1,4 +1,4 @@
-package main
+package RpcServer
 
 import (
 	"flag"
@@ -7,7 +7,9 @@ import (
 	"log"
 	"net"
 
-	pb "dcard-intern/proto/dcard-intern"
+	pb "dcard-intern/proto/proto_gen"
+	"dcard-intern/services"
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 )
 
@@ -20,22 +22,28 @@ type server struct {
 	pb.UnimplementedListServer
 }
 
-// SayHello implements helloworld.GreeterServer
 func (s *server) SetList(stream pb.List_SetListServer) error {
+	head := uuid.New().String()
+	previous := head
 	for {
-		article, err := stream.Recv()
-		if err != io.EOF {
-			head := "qwer"
+		content, err := stream.Recv()
+		if err == io.EOF {
 			return stream.SendAndClose(&pb.ListResponse{Head: &head})
 		}
 		if err != nil {
 			return err
 		}
-		log.Printf("Received: %v", article.GetArticle())
+		article := content.GetArticle()
+		log.Printf("Received: %v", article)
+
+		new_id := uuid.New().String()
+		services.Set(previous, new_id)
+		services.Set(new_id, article)
+		previous = new_id
 	}
 }
 
-func main() {
+func StartServer() {
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
