@@ -33,8 +33,7 @@ func GetHead(w http.ResponseWriter, r *http.Request) {
 	var listHead HeadNode
 	listHead.NextPageKey = services.Get(queryId + "_Key")
 
-	response := ApiResponse{"200", listHead}
-	services.ResponseWithJson(w, http.StatusOK, response)
+	services.ResponseWithJson(w, http.StatusOK, listHead)
 }
 
 func GetPage(w http.ResponseWriter, r *http.Request) {
@@ -44,12 +43,10 @@ func GetPage(w http.ResponseWriter, r *http.Request) {
 	nextPage := services.Get(queryId + "_Key")
 	article := services.Get(queryId + "_Article")
 
-	var response ApiResponse
 	if nextPage == "" {
-		response = ApiResponse{"200", &TailNode{Article: article}}
+		services.ResponseWithJson(w, http.StatusOK, &TailNode{Article: article})
 	} else {
-		response = ApiResponse{"200", &Node{NextPageKey: nextPage, Article: article}}
+		services.ResponseWithJson(w, http.StatusOK,
+			&Node{NextPageKey: nextPage, Article: article})
 	}
-
-	services.ResponseWithJson(w, http.StatusOK, response)
 }

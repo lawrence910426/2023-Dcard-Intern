@@ -10,5 +10,5 @@ func main() {
 	go rpc_server.StartServer()
 
 	router := routes.NewRouter()
-	http.ListenAndServe(":3000", router)
+	http.ListenAndServe(":80", router)
 }

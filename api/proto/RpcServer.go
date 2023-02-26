@@ -1,4 +1,4 @@
-package RpcServer
+package services
 
 import (
 	"flag"
@@ -37,8 +37,8 @@ func (s *server) SetList(stream pb.List_SetListServer) error {
 		log.Printf("Received: %v", article)
 
 		new_id := uuid.New().String()
-		services.Set(previous, new_id)
-		services.Set(new_id, article)
+		services.Set(previous+"_Key", new_id)
+		services.Set(new_id+"_Article", article)
 		previous = new_id
 	}
 }
