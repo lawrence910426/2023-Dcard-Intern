@@ -6,10 +6,12 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"strconv"
+	"testing"
 	"time"
 
-	pb "dcard-intern/proto/dcard-intern"
+	pb "dcard-intern/proto/proto_gen"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -20,7 +22,7 @@ func populate_article(t *testing.T) string {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		t.Error("did not connect: %v", err)
+		t.Error("did not connect")
 	}
 	defer conn.Close()
 	client := pb.NewListClient(conn)
@@ -30,22 +32,22 @@ func populate_article(t *testing.T) string {
 	defer cancel()
 	stream, err := client.SetList(ctx)
 	if err != nil {
-		t.Error("client.SetList failed: %v", err)
+		t.Error("client.SetList failed")
 	}
 	for i := 1; i <= 5; i++ {
 		article_content := "Article-" + strconv.Itoa(i)
 		article := &pb.ListRequest{Article: &article_content}
 		if err := stream.Send(article); err != nil {
-			t.Error("stream.Send() failed: %v", err)
+			t.Error("stream.Send() failed")
 		}
 	}
 
 	reply, err := stream.CloseAndRecv()
 	if err != nil {
-		t.Error("stream.CloseAndRecv failed: %v", err)
+		t.Error("stream.CloseAndRecv failed")
 	}
-	log.Printf("Head identifier: %v", reply)
-	return reply
+	log.Printf("Head identifier: %s", reply)
+	return reply.GetHead()
 }
 
 type Node struct {
@@ -54,11 +56,9 @@ type Node struct {
 }
 
 func send_request(t *testing.T, url string) Node {
-	request, _ := http.NewRequest("GET", url)
-	client := &http.Client{}
-	response, err := client.Do(request)
+	response, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		t.Error("Unable to request server")
 	}
 	defer response.Body.Close()
 
@@ -69,12 +69,13 @@ func send_request(t *testing.T, url string) Node {
 }
 
 func check_article(t *testing.T, head string) {
-	node := send_request("http://localhost/GetHead/" + head)
-	for node.NextPageKey != nil {
-		node = send_request("http://localhost/GetPage/" + node.NextPageKey)
-		if node.Article == nil:
-			t.Error("Article content is nil")
-			log.Printf("Article content: %v", node.Article)
+	node := send_request(t, "http://localhost/GetHead/"+head)
+	for node.NextPageKey != "" {
+		node = send_request(t, "http://localhost/GetPage/"+node.NextPageKey)
+		if node.Article == "" {
+			t.Error("Article content is empty")
+			log.Printf("Article content: %s", node.NextPageKey)
+		}
 	}
 }
 
