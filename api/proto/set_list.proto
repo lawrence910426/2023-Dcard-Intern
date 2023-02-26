@@ -1,12 +1,14 @@
 syntax = "proto2";
 option go_package = "./dcard-intern";
 
-import "google/protobuf/wrappers.proto";
-
 message ListRequest {
-  optional string article = 1;
+    optional string article = 1;
+}
+
+message ListResponse {
+    optional string head = 1;
 }
 
 service List {
-  rpc SetList (stream ListRequest) returns (google.protobuf.Int32Value) {}
+  rpc SetList (stream ListRequest) returns (ListResponse) {}
 }

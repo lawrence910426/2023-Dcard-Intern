@@ -8,7 +8,6 @@ import (
 	"net"
 
 	pb "dcard-intern/proto/dcard-intern"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	"google.golang.org/grpc"
 )
 
@@ -26,7 +25,8 @@ func (s *server) SetList(stream pb.List_SetListServer) error {
 	for {
 		article, err := stream.Recv()
 		if err != io.EOF {
-			return stream.SendAndClose(&wrappers.Int32Value{Value: 5})
+			head := "qwer"
+			return stream.SendAndClose(&pb.ListResponse{Head: &head})
 		}
 		if err != nil {
 			return err
